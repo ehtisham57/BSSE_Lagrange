@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculus Topics - Detailed Presentation</title>
+    <!-- MathJax for rendering LaTeX formulas -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .presentation-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .presentation-header h1 {
+            color: #38bdf8;
+            margin-bottom: 5px;
+        }
+        .slide-container {
+            width: 100%;
+            max-width: 900px;
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 35px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            min-height: 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .slide {
+            display: none;
+        }
+        .slide.active {
+            display: block;
+        }
+        .topic-badge {
+            background: #0284c7;
+            color: white;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .definition-card {
+            background: #0f172a;
+            border-left: 5px solid #38bdf8;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.05em;
+            color: #cbd5e1;
+            line-height: 1.7;
+        }
+        .definition-card h3 {
+            color: #38bdf8;
+            margin-top: 0;
+        }
+        .question-box {
+            font-size: 1.2em;
+            color: #f1f5f9;
+            background: #334155;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #475569;
+        }
+        .toggle-btn {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .toggle-btn:hover {
+            background-color: #059669;
+        }
+        .solution {
+            display: none;
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px dashed #475569;
+            color: #e2e8f0;
+            line-height: 1.7;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #334155;
+        }
+        .nav-btn {
+            background-color: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 10px 22px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .nav-btn:disabled {
+            background-color: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+        .slide-counter {
+            color: #94a3b8;
+            font-size: 0.95em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-header">
+        <h1>Calculus Topics — Detailed Master Presentation</h1>
+        <p style="color: #94a3b8;">Full Theoretical Concepts & Complete Step-by-Step Solved Problems</p>
+    </div>
+
+    <div class="slide-container">
+
+        <!-- ================= TOPIC 1: STATIONARY POINTS ================= -->
+        <!-- Slide 1: Topic 1 Definition -->
+        <div class="slide active">
+            <span class="topic-badge">Topic 1: Stationary Points</span>
+            <div class="definition-card">
+                <h3>Topic Overview & Definition</h3>
+                <p><strong>Definition:</strong> A stationary point (or critical point) of a function \( f(x) \) or multi-variable function \( f(x, y) \) is a point where the gradient/derivative of the function becomes zero.</p>
+                <p><strong>Mathematical Condition:</strong></p>
+                <ul>
+                    <li>For 1 Variable Function \( f(x) \): Set \( f'(x) = \frac{df}{dx} = 0 \).</li>
+                    <li>For 2 Variable Function \( f(x, y) \): Simultaneously set \( f_x = \frac{\partial f}{\partial x} = 0 \) and \( f_y = \frac{\partial f}{\partial y} = 0 \).</li>
+                </ul>
+                <p><strong>Geometrical Meaning:</strong> At a stationary point, the tangent to the curve or tangent plane to the surface is perfectly horizontal (zero slope).</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Topic 1 Question 1 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 1: Stationary Points</span>
+            <div class="question-box">
+                <strong>Question 1:</strong> Find all stationary points for the single-variable function:
+                \[ f(x) = 2x^3 - 9x^2 + 12x - 5 \]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: Compute the First Derivative</strong>
+                        <br>Using standard differentiation rules:
+                        <br>\( f'(x) = \frac{d}{dx}(2x^3 - 9x^2 + 12x - 5) = 6x^2 - 18x + 12 \)
+                    </li>
+                    <li><strong>Step 2: Set Derivative to Zero</strong>
+                        <br>\( 6x^2 - 18x + 12 = 0 \)
+                    </li>
+                    <li><strong>Step 3: Simplify and Factorize the Quadratic Equation</strong>
+                        <br>Divide the entire equation by 6:
+                        <br>\( x^2 - 3x + 2 = 0 \)
+                        <br>Factorizing: \( (x - 1)(x - 2) = 0 \)
+                        <br>Therefore, \( x = 1 \) and \( x = 2 \).
+                    </li>
+                    <li><strong>Step 4: Compute Corresponding y-values</strong>
+                        <br>For \( x = 1 \): \( f(1) = 2(1)^3 - 9(1)^2 + 12(1) - 5 = 2 - 9 + 12 - 5 = 0 \)
+                        <br>For \( x = 2 \): \( f(2) = 2(2)^3 - 9(2)^2 + 12(2) - 5 = 16 - 36 + 24 - 5 = -1 \)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Stationary Points are <strong>(1, 0)</strong> and <strong>(2, -1)</strong>.
+            </div>
+        </div>
+
+        <!-- Slide 3: Topic 1 Question 2 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 1: Stationary Points</span>
+            <div class="question-box">
+                <strong>Question 2:</strong> Find the stationary point for the two-variable function:
+                \[ f(x, y) = 3x^2 + 2y^2 - 12x + 8y + 7 \]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: Calculate First Partial Derivatives</strong>
+                        <br>Differentiate w.r.t \( x \) (treating \( y \) as constant):
+                        <br>\( f_x = \frac{\partial f}{\partial x} = 6x - 12 \)
+                        <br>Differentiate w.r.t \( y \) (treating \( x \) as constant):
+                        <br>\( f_y = \frac{\partial f}{\partial y} = 4y + 8 \)
+                    </li>
+                    <li><strong>Step 2: Set Each Partial Derivative to Zero</strong>
+                        <br>Equation (1): \( 6x - 12 = 0 \implies 6x = 12 \implies x = 2 \)
+                        <br>Equation (2): \( 4y + 8 = 0 \implies 4y = -8 \implies y = -2 \)
+                    </li>
+                    <li><strong>Step 3: Calculate the Corresponding Function Value</strong>
+                        <br>\( f(2, -2) = 3(2)^2 + 2(-2)^2 - 12(2) + 8(-2) + 7 \)
+                        <br>\( = 3(4) + 2(4) - 24 - 16 + 7 = 12 + 8 - 24 - 16 + 7 = -3 \)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> The Stationary Point is <strong>(2, -2)</strong> with value <strong>-3</strong>.
+            </div>
+        </div>
+
+        <!-- Slide 4: Topic 1 Question 3 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 1: Stationary Points</span>
+            <div class="question-box">
+                <strong>Question 3:</strong> Find the stationary points for the non-linear function:
+                \[ f(x, y) = x^3 + y^3 - 3xy \]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: Compute Partial Derivatives</strong>
+                        <br>\( f_x = 3x^2 - 3y \)
+                        <br>\( f_y = 3y^2 - 3x \)
+                    </li>
+                    <li><strong>Step 2: Set Equations to Zero</strong>
+                        <br>1) \( 3x^2 - 3y = 0 \implies y = x^2 \)
+                        <br>2) \( 3y^2 - 3x = 0 \implies x = y^2 \)
+                    </li>
+                    <li><strong>Step 3: Solve System of Equations</strong>
+                        <br>Substitute \( y = x^2 \) into equation (2):
+                        <br>\( (x^2)^2 = x \implies x^4 - x = 0 \)
+                        <br>\( x(x^3 - 1) = 0 \implies x = 0 \text{ or } x = 1 \)
+                        <br>If \( x = 0 \implies y = (0)^2 = 0 \)
+                        <br>If \( x = 1 \implies y = (1)^2 = 1 \)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Stationary Points are <strong>(0, 0)</strong> and <strong>(1, 1)</strong>.
+            </div>
+        </div>
+
+        <!-- ================= TOPIC 2: RELATIVE EXTREMA ================= -->
+        <!-- Slide 5: Topic 2 Definition -->
+        <div class="slide">
+            <span class="topic-badge">Topic 2: Relative Extrema</span>
+            <div class="definition-card">
+                <h3>Topic Overview & Definition</h3>
+                <p><strong>Definition:</strong> Relative (Local) Extrema are local high points (Local Maxima) or local low points (Local Minima) relative to neighboring points in the domain.</p>
+                <p><strong>Second Derivative Test (Single Variable):</strong></p>
+                <ul>
+                    <li>If \( f'(x_0) = 0 \) and \( f''(x_0) > 0 \), then \( x_0 \) is a <strong>Relative Minimum</strong>.</li>
+                    <li>If \( f'(x_0) = 0 \) and \( f''(x_0) < 0 \), then \( x_0 \) is a <strong>Relative Maximum</strong>.</li>
+                </ul>
+                <p><strong>Discriminant Test (Two Variables):</strong> Calculate Discriminant \( D = f_{xx}f_{yy} - (f_{xy})^2 \):</p>
+                <ul>
+                    <li>If \( D > 0 \) and \( f_{xx} > 0 \): Relative Minimum.</li>
+                    <li>If \( D > 0 \) and \( f_{xx} < 0 \): Relative Maximum.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 6: Topic 2 Question 1 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 2: Relative Extrema</span>
+            <div class="question-box">
+                <strong>Question 1:</strong> Find and classify the relative extrema of:
+                \[ f(x) = x^4 - 4x^3 + 10 \]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: First Derivative and Stationary Points</strong>
+                        <br>\( f'(x) = 4x^3 - 12x^2 \)
+                        <br>Set \( f'(x) = 0 \implies 4x^2(x - 3) = 0 \implies x = 0 \) or \( x = 3 \)
+                    </li>
+                    <li><strong>Step 2: Calculate Second Derivative</strong>
+                        <br>\( f''(x) = 12x^2 - 24x \)
+                    </li>
+                    <li><strong>Step 3: Test Point \( x = 3 \)</strong>
+                        <br>\( f''(3) = 12(3)^2 - 24(3) = 108 - 72 = 36 > 0 \)
+                        <br>Since \( f''(3) > 0 \), \( x = 3 \) is a <strong>Relative Minimum</strong>.
+                        <br>Value: \( f(3) = 3^4 - 4(3)^3 + 10 = 81 - 108 + 10 = -17 \)
+                    </li>
+                    <li><strong>Step 4: Test Point \( x = 0 \)</strong>
+                        <br>\( f''(0) = 0 \) (Inconclusive via 2nd derivative test; sign of \( f'(x) \) remains negative on both sides of 0, so no extremum at x=0).
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Relative Minimum at <strong>(3, -17)</strong>.
+            </div>
+        </div>
+
+        <!-- Slide 7: Topic 2 Question 2 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 2: Relative Extrema</span>
+            <div class="question-box">
+                <strong>Question 2:</strong> Determine the relative extrema for the function:
+                \[ f(x, y) = x^2 + xy + y^2 - 6x - 9y \]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: First Partial Derivatives</strong>
+                        <br>\( f_x = 2x + y - 6 \)
+                        <br>\( f_y = x + 2y - 9 \)
+                    </li>
+                    <li><strong>Step 2: Solve System for Critical Point</strong>
+                        <br>Set \( f_x = 0 \implies y = 6 - 2x \)
+                        <br>Substitute into \( f_y = 0 \implies x + 2(6 - 2x) - 9 = 0 \)
+                        <br>\( x + 12 - 4x - 9 = 0 \implies -3x + 3 = 0 \implies x = 1 \)
+                        <br>Substitute back: \( y = 6 - 2(1) = 4 \). Critical Point = \( (1, 4) \).
+                    </li>
+                    <li><strong>Step 3: Second Partial Derivatives & Discriminant</strong>
+                        <br>\( f_{xx} = 2 \), \( f_{yy} = 2 \), \( f_{xy} = 1 \)
+                        <br>\( D = f_{xx}f_{yy} - (f_{xy})^2 = (2)(2) - (1)^2 = 4 - 1 = 3 \)
+                    </li>
+                    <li><strong>Step 4: Conclusion</strong>
+                        <br>Since \( D = 3 > 0 \) and \( f_{xx} = 2 > 0 \), the point \( (1, 4) \) is a <strong>Relative Minimum</strong>.
+                        <br>Value: \( f(1,4) = 1^2 + (1)(4) + 4^2 - 6(1) - 9(4) = 1 + 4 + 16 - 6 - 36 = -21 \)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Relative Minimum at <strong>(1, 4)</strong> with value <strong>-21</strong>.
+            </div>
+        </div>
+
+        <!-- Slide 8: Topic 2 Question 3 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 2: Relative Extrema</span>
+            <div class="question-box">
+                <strong>Question 3:</strong> Find relative extrema for the multi-variable function:
+                \[ f(x, y) = -x^2 - y^2 + 4x + 6y - 5 \]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: First Derivatives</strong>
+                        <br>\( f_x = -2x + 4 = 0 \implies x = 2 \)
+                        <br>\( f_y = -2y + 6 = 0 \implies y = 3 \)
+                        <br>Critical Point = \( (2, 3) \)
+                    </li>
+                    <li><strong>Step 2: Second Derivative Matrix Terms</strong>
+                        <br>\( f_{xx} = -2 \), \( f_{yy} = -2 \), \( f_{xy} = 0 \)
+                    </li>
+                    <li><strong>Step 3: Discriminant Calculation</strong>
+                        <br>\( D = (-2)(-2) - (0)^2 = 4 - 0 = 4 > 0 \)
+                    </li>
+                    <li><strong>Step 4: Classification</strong>
+                        <br>Since \( D = 4 > 0 \) and \( f_{xx} = -2 < 0 \), the point \( (2,3) \) is a <strong>Relative Maximum</strong>.
+                        <br>Value: \( f(2, 3) = -(2)^2 - (3)^2 + 4(2) + 6(3) - 5 = -4 - 9 + 8 + 18 - 5 = 8 \)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Relative Maximum at <strong>(2, 3)</strong> with value <strong>8</strong>.
+            </div>
+        </div>
+
+        <!-- ================= TOPIC 3: SADDLE POINTS ================= -->
+        <!-- Slide 9: Topic 3 Definition -->
+        <div class="slide">
+            <span class="topic-badge">Topic 3: Saddle Points</span>
+            <div class="definition-card">
+                <h3>Topic Overview & Definition</h3>
+                <p><strong>Definition:</strong> A saddle point is a critical point on a multi-variable surface \( f(x, y) \) where the function reaches a relative minimum in one direction, but a relative maximum in another direction. It is neither a local max nor a local min.</p>
+                <p><strong>Mathematical Test:</strong></p>
+                <p>Calculate Second-Order Partial Derivatives and the Hessian Discriminant:</p>
+                \[ D = f_{xx} f_{yy} - (f_{xy})^2 \]
+                <ul>
+                    <li>If <strong>\( D < 0 \)</strong> at a critical point, then that critical point is definitively a <strong>Saddle Point</strong>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 10: Topic 3 Question 1 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 3: Saddle Points</span>
+            <div class="question-box">
+                <strong>Question 1:</strong> Identify all critical points and prove if any are saddle points for:
+                \[ f(x, y) = x^2 - y^2 \]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: Find Critical Points</strong>
+                        <br>\( f_x = 2x = 0 \implies x = 0 \)
+                        <br>\( f_y = -2y = 0 \implies y = 0 \)
+                        <br>Critical point is \( (0, 0) \).
+                    </li>
+                    <li><strong>Step 2: Second Derivatives</strong>
+                        <br>\( f_{xx} = \frac{\partial^2 f}{\partial x^2} = 2 \)
+                        <br>\( f_{yy} = \frac{\partial^2 f}{\partial y^2} = -2 \)
+                        <br>\( f_{xy} = \frac{\partial^2 f}{\partial x \partial y} = 0 \)
+                    </li>
+                    <li><strong>Step 3: Evaluate Discriminant</strong>
+                        <br>\( D = f_{xx} f_{yy} - (f_{xy})^2 = (2)(-2) - (0)^2 = -4 \)
+                    </li>
+                    <li><strong>Step 4: Conclusion</strong>
+                        <br>Since \( D = -4 < 0 \), the point \( (0, 0) \) is a <strong>Saddle Point</strong>.
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Saddle Point exists at <strong>(0, 0)</strong>.
+            </div>
+        </div>
+
+        <!-- Slide 11: Topic 3 Question 2 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 3: Saddle Points</span>
+            <div class="question-box">
+                <strong>Question 2:</strong> Find the saddle point for the surface:
+                \[ f(x, y) = 4xy - x^4 - y^4 \]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: First Partial Derivatives</strong>
+                        <br>\( f_x = 4y - 4x^3 = 0 \implies y = x^3 \)
+                        <br>\( f_y = 4x - 4y^3 = 0 \implies x = y^3 \)
+                    </li>
+                    <li><strong>Step 2: Solve System</strong>
+                        <br>Substitute \( y = x^3 \) into \( x = y^3 \):
+                        <br>\( x = (x^3)^3 = x^9 \implies x^9 - x = 0 \implies x(x^8 - 1) = 0 \)
+                        <br>Real roots: \( x = 0, x = 1, x = -1 \).
+                        <br>Critical points: \( (0, 0) \), \( (1, 1) \), \( (-1, -1) \).
+                    </li>
+                    <li><strong>Step 3: Second Derivatives & Discriminant Test</strong>
+                        <br>\(f_{xx} = -12x^2\), \(f_{yy} = -12y^2\), \(f_{xy} = 4\)
+                        <br>At \((0, 0)\): \(f_{xx} = 0, f_{yy} = 0, f_{xy} = 4\)
+                        <br>\(D = (0)(0) - (4)^2 = -16 < 0 \implies\) <strong>Saddle Point</strong>.
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Saddle Point is located at <strong>(0, 0)</strong> (Points (1,1) and (-1,-1) are local maxima).
+            </div>
+        </div>
+
+        <!-- Slide 12: Topic 3 Question 3 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 3: Saddle Points</span>
+            <div class="question-box">
+                <strong>Question 3:</strong> Locate the saddle point of the function:
+                \[f(x, y) = x^3 - 3x + y^2\]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: Find Critical Points</strong>
+                        <br>\(f_x = 3x^2 - 3 = 0 \implies x^2 = 1 \implies x = 1 \text{ or } x = -1\)
+                        <br>\(f_y = 2y = 0 \implies y = 0\)
+                        <br>Critical Points are \((1, 0)\) and \((-1, 0)\).
+                    </li>
+                    <li><strong>Step 2: Second Order Partials</strong>
+                        <br>\(f_{xx} = 6x\), \(f_{yy} = 2\), \(f_{xy} = 0\)
+                    </li>
+                    <li><strong>Step 3: Test Point \((-1, 0)\)</strong>
+                        <br>\(f_{xx}(-1, 0) = 6(-1) = -6\)
+                        <br>\(D = f_{xx} f_{yy} - (f_{xy})^2 = (-6)(2) - (0)^2 = -12\)
+                        <br>Since \(D = -12 < 0\), \((-1, 0)\) is a <strong>Saddle Point</strong>.
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Saddle Point is at <strong>(-1, 0)</strong> (while (1, 0) is a local minimum).
+            </div>
+        </div>
+
+        <!-- ================= TOPIC 4: LAGRANGE MULTIPLIERS ================= -->
+        <!-- Slide 13: Topic 4 Definition -->
+        <div class="slide">
+            <span class="topic-badge">Topic 4: Lagrange Multipliers</span>
+            <div class="definition-card">
+                <h3>Topic Overview & Definition</h3>
+                <p><strong>Definition:</strong> Lagrange Multipliers is a strategy for finding the local maxima and minima of a function subject to equality constraints.</p>
+                <p><strong>Mathematical Formulation:</strong></p>
+                <p>To optimize objective function \(f(x, y)\) subject to constraint \(g(x, y) = c\), introduce multiplier \(\lambda\) and define Lagrangian function:</p>
+                \[L(x, y, \lambda) = f(x, y) - \lambda (g(x, y) - c)\]
+                <p>Set gradient to zero vector: \(\nabla f = \lambda \nabla g\), leading to system:</p>
+                <ol>
+                    <li>\(f_x = \lambda g_x\)</li>
+                    <li>\(f_y = \lambda g_y\)</li>
+                    <li>\(g(x, y) = c\)</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Slide 14: Topic 4 Question 1 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 4: Lagrange Multipliers</span>
+            <div class="question-box">
+                <strong>Question 1:</strong> Minimize \(f(x, y) = x^2 + y^2\) subject to the constraint equation \(2x + y = 10\).
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: Set Up Gradient Equations (\(\nabla f = \lambda \nabla g\))</strong>
+                        <br>Objective: \(f(x, y) = x^2 + y^2\)
+                        <br>Constraint: \(g(x, y) = 2x + y = 10\)
+                        <br>1) \(f_x = \lambda g_x \implies 2x = 2\lambda \implies x = \lambda\)
+                        <br>2) \(f_y = \lambda g_y \implies 2y = \lambda(1) \implies y = \frac{\lambda}{2}\)
+                    </li>
+                    <li><strong>Step 2: Express \(x\) in terms of \(y\)</strong>
+                        <br>Since \(x = \lambda\) and \(y = \frac{\lambda}{2} \implies x = 2y\).
+                    </li>
+                    <li><strong>Step 3: Substitute into Constraint Equation</strong>
+                        <br>\(2(2y) + y = 10 \implies 4y + y = 10 \implies 5y = 10 \implies y = 2\)
+                        <br>Since \(x = 2y \implies x = 2(2) = 4\).
+                    </li>
+                    <li><strong>Step 4: Compute Minimum Function Value</strong>
+                        <br>\(f(4, 2) = 4^2 + 2^2 = 16 + 4 = 20\)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Minimum value is <strong>20</strong> at <strong>(4, 2)</strong>.
+            </div>
+        </div>
+
+        <!-- Slide 15: Topic 4 Question 2 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 4: Lagrange Multipliers</span>
+            <div class="question-box">
+                <strong>Question 2:</strong> Maximize \(f(x, y) = xy\) subject to the constraint \(x + y = 8\).
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: Lagrange Gradient Equations</strong>
+                        <br>\(f_x = y\), \(g_x = 1 \implies y = \lambda(1) \implies \lambda = y\)
+                        <br>\(f_y = x\), \(g_y = 1 \implies x = \lambda(1) \implies \lambda = x\)
+                    </li>
+                    <li><strong>Step 2: Equate Multipliers</strong>
+                        <br>\(x = y\)
+                    </li>
+                    <li><strong>Step 3: Apply Constraint</strong>
+                        <br>\(x + x = 8 \implies 2x = 8 \implies x = 4\)
+                        <br>Since \(y = x \implies y = 4\).
+                    </li>
+                    <li><strong>Step 4: Compute Maximum Value</strong>
+                        <br>\(f(4, 4) = (4)(4) = 16\)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Maximum value is <strong>16</strong> at <strong>(4, 4)</strong>.
+            </div>
+        </div>
+
+        <!-- Slide 16: Topic 4 Question 3 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 4: Lagrange Multipliers</span>
+            <div class="question-box">
+                <strong>Question 3:</strong> Find the maximum value of \(f(x, y) = 4x + 2y\) subject to constraint \(x^2 + y^2 = 5\).
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: Set Up System</strong>
+                        <br>\(f_x = 4\), \(g_x = 2x \implies 4 = 2\lambda x \implies x = \frac{2}{\lambda}\)
+                        <br>\(f_y = 2\), \(g_y = 2y \implies 2 = 2\lambda y \implies y = \frac{1}{\lambda}\)
+                    </li>
+                    <li><strong>Step 2: Substitute into Constraint</strong>
+                        <br>\(\left(\frac{2}{\lambda}\right)^2 + \left(\frac{1}{\lambda}\right)^2 = 5\)
+                        <br>\(\frac{4}{\lambda^2} + \frac{1}{\lambda^2} = 5 \implies \frac{5}{\lambda^2} = 5 \implies \lambda^2 = 1 \implies \lambda = \pm 1\)
+                    </li>
+                    <li><strong>Step 3: Evaluate Points</strong>
+                        <br>For \(\lambda = 1 \implies x = 2, y = 1\).
+                        <br>\(f(2, 1) = 4(2) + 2(1) = 10\)
+                        <br>For \(\lambda = -1 \implies x = -2, y = -1\).
+                        <br>\(f(-2, -1) = 4(-2) + 2(-1) = -10\)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Maximum value is <strong>10</strong> at <strong>(2, 1)</strong>.
+            </div>
+        </div>
+
+        <!-- ================= TOPIC 5: MAXIMA OR MINIMA ================= -->
+        <!-- Slide 17: Topic 5 Definition -->
+        <div class="slide">
+            <span class="topic-badge">Topic 5: Maxima or Minima</span>
+            <div class="definition-card">
+                <h3>Topic Overview & Definition</h3>
+                <p><strong>Definition:</strong> Maxima and Minima refer collectively to the highest (peak) and lowest (trough) values that a function attains within a given domain.</p>
+                <p><strong>Absolute vs Relative:</strong></p>
+                <ul>
+                    <li><strong>Absolute Maximum/Minimum:</strong> The global highest or lowest value over the entire domain of the function.</li>
+                    <li><strong>Method of Determination:</strong> Find critical points using first derivative/partials, evaluate the 2nd derivative test or matrix, and compare function outputs.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 18: Topic 5 Question 1 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 5: Maxima or Minima</span>
+            <div class="question-box">
+                <strong>Question 1:</strong> Determine whether the function has a maximum or minimum, and find its value:
+                \[f(x) = -3x^2 + 12x - 5\]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: First Derivative</strong>
+                        <br>\(f'(x) = -6x + 12\)
+                    </li>
+                    <li><strong>Step 2: Critical Point</strong>
+                        <br>\(-6x + 12 = 0 \implies 6x = 12 \implies x = 2\)
+                    </li>
+                    <li><strong>Step 3: Second Derivative Test</strong>
+                        <br>\(f''(x) = -6\)
+                        <br>Since \(f''(2) = -6 < 0\), the function has a <strong>Maximum</strong> at \(x = 2\).
+                    </li>
+                    <li><strong>Step 4: Calculate Maximum Value</strong>
+                        <br>\(f(2) = -3(2)^2 + 12(2) - 5 = -3(4) + 24 - 5 = -12 + 24 - 5 = 7\)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Function has a <strong>Maximum</strong> value of <strong>7</strong> at <strong>x = 2</strong>.
+            </div>
+        </div>
+
+        <!-- Slide 19: Topic 5 Question 2 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 5: Maxima or Minima</span>
+            <div class="question-box">
+                <strong>Question 2:</strong> Find the absolute minimum value of the function:
+                \[f(x, y) = 2x^2 + 3y^2 - 8x - 12y + 20\]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: Partial Derivatives</strong>
+                        <br>\(f_x = 4x - 8 = 0 \implies x = 2\)
+                        <br>\(f_y = 6y - 12 = 0 \implies y = 2\)
+                        <br>Critical point is \((2, 2)\).
+                    </li>
+                    <li><strong>Step 2: Second Partials & Discriminant</strong>
+                        <br>\(f_{xx} = 4\), \(f_{yy} = 6\), \(f_{xy} = 0\)
+                        <br>\(D = (4)(6) - (0)^2 = 24 > 0\).
+                        <br>Since \(D > 0\) and \(f_{xx} = 4 > 0\), it is a <strong>Minimum</strong>.
+                    </li>
+                    <li><strong>Step 3: Calculate Minimum Value</strong>
+                        <br>\(f(2, 2) = 2(2)^2 + 3(2)^2 - 8(2) - 12(2) + 20\)
+                        <br>\(= 2(4) + 3(4) - 16 - 24 + 20 = 8 + 12 - 16 - 24 + 20 = 0\)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Absolute <strong>Minimum</strong> value is <strong>0</strong> at <strong>(2, 2)</strong>.
+            </div>
+        </div>
+
+        <!-- Slide 20: Topic 5 Question 3 -->
+        <div class="slide">
+            <span class="topic-badge">Topic 5: Maxima or Minima</span>
+            <div class="question-box">
+                <strong>Question 3:</strong> Find all local maxima and minima for:
+                \[f(x) = x^3 - 6x^2 + 9x + 2\]
+            </div>
+            <button class="toggle-btn" onclick="toggleSolution(this)">Show Detailed Solution</button>
+            <div class="solution">
+                <strong>Complete Step-by-Step Solution:</strong>
+                <ol>
+                    <li><strong>Step 1: Differentiate and Solve \(f'(x) = 0\)</strong>
+                        <br>\(f'(x) = 3x^2 - 12x + 9 = 0\)
+                        <br>Divide by 3: \(x^2 - 4x + 3 = 0 \implies (x - 1)(x - 3) = 0\)
+                        <br>Critical points at \(x = 1\) and \(x = 3\).
+                    </li>
+                    <li><strong>Step 2: Second Derivative Test</strong>
+                        <br>\(f''(x) = 6x - 12\)
+                        <br>At \(x = 1\): \(f''(1) = 6(1) - 12 = -6 < 0 \implies\) <strong>Local Maximum</strong>.
+                        <br>At \(x = 3\): \(f''(3) = 6(3) - 12 = 6 > 0 \implies\) <strong>Local Minimum</strong>.
+                    </li>
+                    <li><strong>Step 3: Evaluate Values</strong>
+                        <br>Max Value at \(x = 1\): \(f(1) = 1^3 - 6(1)^2 + 9(1) + 2 = 6\)
+                        <br>Min Value at \(x = 3\): \(f(3) = 3^3 - 6(3)^2 + 9(3) + 2 = 27 - 54 + 27 + 2 = 2\)
+                    </li>
+                </ol>
+                <strong>Final Answer:</strong> Local <strong>Maximum</strong> = 6 at x=1; Local <strong>Minimum</strong> = 2 at x=3.
+            </div>
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="controls">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">Previous</button>
+            <span class="slide-counter" id="slideCounter">Slide 1 of 20</span>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next</button>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const slideCounter = document.getElementById('slideCounter');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function updateSlideDisplay() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            slideCounter.textContent = `Slide ${currentSlide + 1} of ${slides.length}`;
+            
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlideDisplay();
+        }
+
+        function toggleSolution(btn) {
+            const solution = btn.nextElementSibling;
+            if (solution.style.display === "block") {
+                solution.style.display = "none";
+                btn.textContent = "Show Detailed Solution";
+            } else {
+                solution.style.display = "block";
+                btn.textContent = "Hide Detailed Solution";
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "ArrowLeft" && currentSlide > 0) {
+                changeSlide(-1);
+            } else if (e.key === "ArrowRight" && currentSlide < slides.length - 1) {
+                changeSlide(1);
+            }
+        });
+
+        // Initialize display
+        updateSlideDisplay();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multivariable Optimization: Maxima, Minima & Lagrange Multipliers</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- MathJax 3 CDN configuration -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            startup: {
+                pageReady: () => {
+                    return MathJax.startup.defaultPageReady().then(() => {
+                        console.log('MathJax initial rendering complete');
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .math-block {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Custom scrollbar for inner slide containers */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(100, 116, 139, 0.8);
+        }
+
+        /* Step reveal animations */
+        .step-reveal {
+            transition: all 0.4s ease-in-out;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transform: translateY(10px);
+        }
+        .step-reveal.revealed {
+            opacity: 1;
+            max-height: 2000px;
+            transform: translateY(0);
+        }
+
+        .slide-content {
+            display: none;
+        }
+        .slide-content.active {
+            display: block;
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.99) translateY(4px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-sky-500 selection:text-white">
+
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-slate-900/80 dark:bg-slate-900/80 border-b border-slate-800 dark:border-slate-800 transition-colors">
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-800 h-1.5 overflow-hidden">
+            <div id="progress-bar" class="bg-gradient-to-r from-sky-500 via-indigo-500 to-emerald-400 h-full w-0 transition-all duration-300"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- App Title / Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="goToSlide(0)">
+                <div class="bg-gradient-to-br from-sky-400 to-indigo-600 p-2 rounded-lg text-white shadow-md">
+                    <i class="fa-solid me-0 fa-calculator text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg tracking-tight text-slate-800 dark:text-slate-100">SYED EHTISHAM<span class="text-sky-500 font-normal text-sm"> UDDIN BALKHI </span></h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">MSc in Pure MATH | MS in APPLIED MATH</p>
+                </div>
+            </div>
+
+            <!-- Header Controls -->
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <!-- Slide Counter Badge -->
+                <span id="slide-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-sky-600 dark:text-sky-400 border border-slate-200 dark:border-slate-700">
+                    Slide 1 / 14
+                </span>
+
+                <!-- TOC Button -->
+                <button onclick="toggleTOC()" title="Table of Contents" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <i class="fa-solid fa-list-ul"></i>
+                    <span class="hidden md:inline ml-1.5 text-xs font-medium">Index</span>
+                </button>
+
+                <!-- Dark / Light Mode Toggle -->
+                <button id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-amber-500 dark:text-sky-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <i class="fa-solid fa-sun hidden dark:inline text-lg"></i>
+                    <i class="fa-solid fa-moon inline dark:hidden text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 flex flex-col">
+        <div id="deck-container" class="bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 rounded-2xl shadow-2xl p-4 sm:p-8 flex-grow flex flex-col justify-between relative transition-colors">
+            
+            <!-- Slides Holder -->
+            <div id="slides-wrapper" class="tex2jax_process flex-grow overflow-y-auto max-h-[72vh] pr-2">
+
+                <!-- SLIDE 1: Title & Overview -->
+                <div class="slide-content active" id="slide-0">
+                    <div class="text-center my-6">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300">Overview & Fundamentals</span>
+                        <h2 class="text-3xl sm:text-5xl font-extrabold mt-3 text-slate-900 dark:text-white tracking-tight">Multivariable Optimization</h2>
+                        <p class="text-lg text-slate-600 dark:text-slate-300 mt-2 max-w-2xl mx-auto">Mastering Extreme Values (Maxima, Minima, Saddle Points) & Constrained Optimization using Lagrange Multipliers</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                        <div class="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div class="flex items-center space-x-3 text-sky-500 mb-2">
+                                <i class="fa-solid fa-crosshairs text-xl"></i>
+                                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">Stationary Points</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">Points where all partial derivatives vanish simultaneously ($\nabla f = \mathbf{0}$). The tangent plane to the surface is completely horizontal at these locations.</p>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div class="flex items-center space-x-3 text-emerald-500 mb-2">
+                                <i class="fa-solid fa-mountain text-xl"></i>
+                                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">Relative Extrema</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 dark:text-slate-300"><strong>Local Maximum:</strong> Peak where $f(x,y) \le f(a,b)$ nearby.<br><strong>Local Minimum:</strong> Trough where $f(x,y) \ge f(a,b)$ nearby.</p>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div class="flex items-center space-x-3 text-amber-500 mb-2">
+                                <i class="fa-solid fa-horse-head text-xl"></i>
+                                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">Saddle Points</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">A stationary point that is neither a maximum nor a minimum. The function increases along one direction and decreases along another direction.</p>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div class="flex items-center space-x-3 text-indigo-500 mb-2">
+                                <i class="fa-solid fa-link text-xl"></i>
+                                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">Lagrange Multipliers</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">A powerful strategy for finding the local extrema of a function subject to equality constraints ($\phi(x,y,z)=0$) using gradient alignment $\nabla f = \lambda \nabla \phi$.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 2: Algorithm - 2 Variables -->
+                <div class="slide-content" id="slide-1">
+                    <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400 mb-2 flex items-center">
+                        <i class="fa-solid fa-gears mr-2"></i> Algorithm: Maxima & Minima of 2 Variables
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm mb-6">Standard Second-Derivative Test for $f(x, y)$</p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <span class="flex-shrink-0 w-8 h-8 bg-sky-500 text-white font-bold rounded-full flex items-center justify-center">1</span>
+                            <div>
+                                <h4 class="font-semibold text-slate-800 dark:text-slate-100">Find First Partial Derivatives</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">Compute $f_x = \frac{\partial f}{\partial x}$ and $f_y = \frac{\partial f}{\partial y}$.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <span class="flex-shrink-0 w-8 h-8 bg-sky-500 text-white font-bold rounded-full flex items-center justify-center">2</span>
+                            <div>
+                                <h4 class="font-semibold text-slate-800 dark:text-slate-100">Find Stationary Points</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">Solve the simultaneous system $f_x = 0$ and $f_y = 0$ to get critical points $(a, b)$.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <span class="flex-shrink-0 w-8 h-8 bg-sky-500 text-white font-bold rounded-full flex items-center justify-center">3</span>
+                            <div>
+                                <h4 class="font-semibold text-slate-800 dark:text-slate-100">Calculate Second Partial Derivatives</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">Evaluate at $(a, b)$: $r = f_{xx} = \frac{\partial^2 f}{\partial x^2}$, $s = f_{xy} = \frac{\partial^2 f}{\partial x \partial y}$, $t = f_{yy} = \frac{\partial^2 f}{\partial y^2}$.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <span class="flex-shrink-0 w-8 h-8 bg-sky-500 text-white font-bold rounded-full flex items-center justify-center">4</span>
+                            <div>
+                                <h4 class="font-semibold text-slate-800 dark:text-slate-100">Calculate Discriminant $D = rt - s^2$</h4>
+                                <ul class="list-disc list-inside text-sm text-slate-600 dark:text-slate-300 mt-2 space-y-1">
+                                    <li>If $rt - s^2 > 0$ and $r < 0$ (or $t < 0$) $\implies$ <strong class="text-emerald-500">Local Maximum</strong> at $(a, b)$.</li>
+                                    <li>If $rt - s^2 > 0$ and $r > 0$ (or $t > 0$) $\implies$ <strong class="text-sky-500">Local Minimum</strong> at $(a, b)$.</li>
+                                    <li>If $rt - s^2 < 0$ $\implies$ <strong class="text-amber-500">Saddle Point</strong> at $(a, b)$.</li>
+                                    <li>If $rt - s^2 = 0$ $\implies$ <strong class="text-rose-500">Test Inconclusive</strong> (further analysis required).</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 3: Solved Examples - 2 Variables -->
+                <div class="slide-content" id="slide-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400">5 Solved Examples: 2 Variables</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Use 'Next Step' button to reveal solution line-by-line</p>
+                        </div>
+                        <button onclick="revealNextStep('s3-ex')" class="px-3 py-1.5 text-xs font-semibold bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition shadow-md flex items-center">
+                            <i class="fa-solid fa-forward mr-1.5"></i> Next Step
+                        </button>
+                    </div>
+
+                    <!-- Example Tabs / Selector -->
+                    <div class="flex space-x-2 border-b border-slate-200 dark:border-slate-700 mb-4 overflow-x-auto pb-1">
+                        <button onclick="switchTab('s3', 0)" class="s3-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-sky-500 text-white">Ex 1: Standard Polynomial</button>
+                        <button onclick="switchTab('s3', 1)" class="s3-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 2: Cubic Curve</button>
+                        <button onclick="switchTab('s3', 2)" class="s3-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 3: Saddle Point</button>
+                        <button onclick="switchTab('s3', 3)" class="s3-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 4: Distance Square</button>
+                        <button onclick="switchTab('s3', 4)" class="s3-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 5: Exponential Product</button>
+                    </div>
+
+                    <!-- EX 1 -->
+                    <div id="s3-ex-0" class="s3-ex-content space-y-3">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 1:</strong> Find the extreme values of $f(x, y) = x^2 + y^2 - 4x - 6y + 13$.
+                        </div>
+
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: First Partial Derivatives</strong>
+                            <p class="mt-1">$f_x = 2x - 4$, $\quad f_y = 2y - 6$.</p>
+                        </div>
+
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 2: Stationary Points</strong>
+                            <p class="mt-1">Set $f_x = 0 \implies 2x - 4 = 0 \implies x = 2$.</p>
+                            <p>Set $f_y = 0 \implies 2y - 6 = 0 \implies y = 3$.</p>
+                            <p>Stationary Point: $(2, 3)$.</p>
+                        </div>
+
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 3: Second Partial Derivatives</strong>
+                            <p class="mt-1">$r = f_{xx} = 2$, $\quad s = f_{xy} = 0$, $\quad t = f_{yy} = 2$.</p>
+                        </div>
+
+                        <div class="step-reveal s3-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 4: Classification & Conclusion</strong>
+                            <p class="mt-1">$D = rt - s^2 = (2)(2) - (0)^2 = 4 > 0$.</p>
+                            <p>Since $D > 0$ and $r = 2 > 0$, the point $(2, 3)$ is a <strong>Minimum</strong>.</p>
+                            <p class="font-bold mt-1 text-slate-800 dark:text-slate-100">Minimum Value: $f(2,3) = (2)^2 + (3)^2 - 4(2) - 6(3) + 13 = 0$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 2 -->
+                    <div id="s3-ex-1" class="s3-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 2:</strong> Examine $f(x, y) = x^3 + y^3 - 3xy$ for maxima and minima.
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: First Partial Derivatives</strong>
+                            <p class="mt-1">$f_x = 3x^2 - 3y$, $\quad f_y = 3y^2 - 3x$.</p>
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 2: Stationary Points</strong>
+                            <p class="mt-1">$3x^2 - 3y = 0 \implies y = x^2$. Substitute into $3y^2 - 3x = 0$:</p>
+                            <p>$(x^2)^2 - x = 0 \implies x(x^3 - 1) = 0 \implies x = 0$ or $x = 1$.</p>
+                            <p>Points: $(0, 0)$ and $(1, 1)$.</p>
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 3: Second Derivatives</strong>
+                            <p class="mt-1">$r = f_{xx} = 6x$, $\quad s = f_{xy} = -3$, $\quad t = f_{yy} = 6y$.</p>
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 4: Classification</strong>
+                            <p class="mt-1">At $(0,0)$: $r=0, s=-3, t=0 \implies D = 0 - (-3)^2 = -9 < 0$ $\rightarrow$ <strong>Saddle Point</strong>.</p>
+                            <p>At $(1,1)$: $r=6, s=-3, t=6 \implies D = (6)(6) - (-3)^2 = 27 > 0$, $r=6 > 0$ $\rightarrow$ <strong>Minimum</strong>.</p>
+                            <p class="font-bold text-slate-800 dark:text-slate-100">Min Value: $f(1,1) = 1 + 1 - 3 = -1$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 3 -->
+                    <div id="s3-ex-2" class="s3-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 3:</strong> Investigate $f(x, y) = x^2 - y^2$.
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: First Derivatives</strong>
+                            <p class="mt-1">$f_x = 2x = 0 \implies x = 0$. $f_y = -2y = 0 \implies y = 0$. Critical Point: $(0,0)$.</p>
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 2: Second Derivatives</strong>
+                            <p class="mt-1">$r = f_{xx} = 2$, $s = f_{xy} = 0$, $t = f_{yy} = -2$.</p>
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-lg">
+                            <strong class="text-amber-500">Step 3: Conclusion</strong>
+                            <p class="mt-1">$D = rt - s^2 = (2)(-2) - 0 = -4 < 0$.</p>
+                            <p>Therefore, $(0,0)$ is a <strong>Saddle Point</strong>.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 4 -->
+                    <div id="s3-ex-3" class="s3-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 4:</strong> Find extreme values of $f(x, y) = 4 + x^3 + y^3 - 3xy$.
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Critical Points</strong>
+                            <p class="mt-1">$f_x = 3x^2 - 3y = 0$, $f_y = 3y^2 - 3x = 0$. Stationary points: $(0,0)$ and $(1,1)$.</p>
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Evaluation</strong>
+                            <p class="mt-1">At $(0,0)$: $D = -9 < 0$ (Saddle Point).</p>
+                            <p>At $(1,1)$: $r=6, t=6, s=-3 \implies D = 27 > 0, r > 0 \implies$ <strong>Local Minimum</strong>.</p>
+                            <p class="font-bold text-slate-800 dark:text-slate-100">Minimum Value: $f(1,1) = 4 + 1 + 1 - 3 = 3$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 5 -->
+                    <div id="s3-ex-4" class="s3-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 5:</strong> Find stationary points of $f(x, y) = xy e^{-(x^2+y^2)/2}$.
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: First Partial Derivatives</strong>
+                            <p class="mt-1">$f_x = y(1 - x^2)e^{-(x^2+y^2)/2} = 0$, $\quad f_y = x(1 - y^2)e^{-(x^2+y^2)/2} = 0$.</p>
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 2: Critical Points</strong>
+                            <p class="mt-1">Points: $(0,0)$, $(1,1)$, $(-1,-1)$, $(1,-1)$, $(-1,1)$.</p>
+                        </div>
+                        <div class="step-reveal s3-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 3: Classification Result</strong>
+                            <p class="mt-1">$(1,1)$ and $(-1,-1)$ are <strong>Local Maxima</strong> with value $1/e$.</p>
+                            <p>$(1,-1)$ and $(-1,1)$ are <strong>Local Minima</strong> with value $-1/e$.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 4: Unsolved Questions - 2 Variables -->
+                <div class="slide-content" id="slide-3">
+                    <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400 mb-2">15 Practice Questions: 2 Variables</h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-xs mb-4">Click "Show Solution Key" to verify your answers.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <!-- 15 items dynamically structured -->
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">1. $f(x, y) = x^2 + 2y^2 - 4x + 4y$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(2, -1)$, Min Value = $-6$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">2. $f(x, y) = 10 + 12x - 3x^2 + 6y - 2y^2$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max at $(2, 1.5)$, Max Value = $26.5$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">3. $f(x, y) = x^3 - 3xy^2$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Saddle point at $(0, 0)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">4. $f(x, y) = x^2 + xy + y^2 - 6x$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(4, -2)$, Min Value = $-12$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">5. $f(x, y) = x^4 + y^4 - 4xy$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(1, 1)$ & $(-1, -1)$, Saddle at $(0, 0)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">6. $f(x, y) = x^2 - 2xy + 2y^2 - 2x + 4y$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(0, -1)$, Min Value = $-2$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">7. $f(x, y) = y^2 - x^2$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Saddle point at $(0, 0)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">8. $f(x, y) = x^3 + 3xy^2 - 15x - 12y$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(2, 1)$, Max at $(-2, -1)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">9. $f(x, y) = 2x^2 + y^2 + 8x - 6y + 20$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(-2, 3)$, Min Value = $3$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">10. $f(x, y) = e^{x^2 + y^2}$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(0, 0)$, Min Value = $1$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">11. $f(x, y) = x^2 y - x y^2$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Saddle point at $(0, 0)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">12. $f(x, y) = \sin x + \sin y$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max at $(\pi/2, \pi/2)$, Max Value = $2$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">13. $f(x, y) = x^3 - 3x + y^2$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(1, 0)$, Saddle at $(-1, 0)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">14. $f(x, y) = 3x^2 - y^2 + 4x - 6y$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Saddle point at $(-2/3, -3)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">15. $f(x, y) = x^2 y + y^3 - 12y$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(0, 2)$, Max at $(0, -2)$.</p>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 5: Algorithm - 3 Variables -->
+                <div class="slide-content" id="slide-4">
+                    <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400 mb-2 flex items-center">
+                        <i class="fa-solid fa-matrix mr-2"></i> Algorithm: Maxima & Minima of 3 Variables
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm mb-6">Using the Hessian Matrix & Principal Minor Determinants</p>
+
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-100 mb-2">1. The Hessian Matrix ($H$)</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-300 mb-2">Construct the matrix of second-order partial derivatives evaluated at critical point $(x_0, y_0, z_0)$ where $f_x = f_y = f_z = 0$:</p>
+                            <div class="bg-slate-100 dark:bg-slate-950 p-3 rounded-lg overflow-x-auto text-center text-sm font-mono">
+                                $$H = \begin{pmatrix} f_{xx} & f_{xy} & f_{xz} \\ f_{yx} & f_{yy} & f_{yz} \\ f_{zx} & f_{zy} & f_{zz} \end{pmatrix}$$
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-100 mb-2">2. Principal Minors Test</h4>
+                            <div class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                                <p>$$\Delta_1 = f_{xx}, \quad \Delta_2 = \begin{vmatrix} f_{xx} & f_{xy} \\ f_{yx} & f_{yy} \end{vmatrix}, \quad \Delta_3 = \det(H)$$</p>
+                                <ul class="list-disc list-inside mt-2 space-y-1">
+                                    <li><strong class="text-sky-500">Local Minimum (Positive Definite):</strong> $\Delta_1 > 0, \quad \Delta_2 > 0, \quad \Delta_3 > 0$.</li>
+                                    <li><strong class="text-emerald-500">Local Maximum (Negative Definite):</strong> $\Delta_1 < 0, \quad \Delta_2 > 0, \quad \Delta_3 < 0$ (Alternating signs).</li>
+                                    <li><strong class="text-amber-500">Saddle Point (Indefinite):</strong> Non-zero determinants that fail both conditions above.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 6: Solved Examples - 3 Variables -->
+                <div class="slide-content" id="slide-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400">5 Solved Examples: 3 Variables</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Step-by-step Hessian matrix classification</p>
+                        </div>
+                        <button onclick="revealNextStep('s6-ex')" class="px-3 py-1.5 text-xs font-semibold bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition shadow-md flex items-center">
+                            <i class="fa-solid fa-forward mr-1.5"></i> Next Step
+                        </button>
+                    </div>
+
+                    <div class="flex space-x-2 border-b border-slate-200 dark:border-slate-700 mb-4 overflow-x-auto pb-1">
+                        <button onclick="switchTab('s6', 0)" class="s6-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-sky-500 text-white">Ex 1: Standard Quad</button>
+                        <button onclick="switchTab('s6', 1)" class="s6-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 2: Coupled Terms</button>
+                        <button onclick="switchTab('s6', 2)" class="s6-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 3: Maximum Case</button>
+                        <button onclick="switchTab('s6', 3)" class="s6-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 4: Saddle Test</button>
+                        <button onclick="switchTab('s6', 4)" class="s6-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 5: Exponential 3D</button>
+                    </div>
+
+                    <!-- EX 1 -->
+                    <div id="s6-ex-0" class="s6-ex-content space-y-3">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 1:</strong> Find the extrema of $f(x, y, z) = x^2 + y^2 + z^2 - 2x - 4y - 6z + 14$.
+                        </div>
+
+                        <div class="step-reveal s6-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: First Derivatives & Stationary Point</strong>
+                            <p class="mt-1">$f_x = 2x - 2 = 0 \implies x = 1$</p>
+                            <p>$f_y = 2y - 4 = 0 \implies y = 2$</p>
+                            <p>$f_z = 2z - 6 = 0 \implies z = 3$ $\implies$ Point $(1, 2, 3)$.</p>
+                        </div>
+
+                        <div class="step-reveal s6-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 2: Construct Hessian Matrix</strong>
+                            <p class="mt-1">$$H = \begin{pmatrix} 2 & 0 & 0 \\ 0 & 2 & 0 \\ 0 & 0 & 2 \end{pmatrix}$$</p>
+                        </div>
+
+                        <div class="step-reveal s6-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 3: Principal Minors & Conclusion</strong>
+                            <p class="mt-1">$\Delta_1 = 2 > 0$, $\quad \Delta_2 = 4 > 0$, $\quad \Delta_3 = 8 > 0$.</p>
+                            <p>Positive Definite $\implies$ <strong>Local Minimum</strong> at $(1, 2, 3)$.</p>
+                            <p class="font-bold text-slate-800 dark:text-slate-100 mt-1">Min Value = $f(1,2,3) = 1 + 4 + 9 - 2 - 8 - 18 + 14 = 0$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 2 -->
+                    <div id="s6-ex-1" class="s6-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 2:</strong> Analyze $f(x, y, z) = x^2 + 2y^2 + 3z^2 - 2xy - 4yz$.
+                        </div>
+                        <div class="step-reveal s6-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Critical Point</strong>
+                            <p class="mt-1">$f_x = 2x - 2y = 0$, $f_y = 4y - 2x - 4z = 0$, $f_z = 6z - 4y = 0$.</p>
+                            <p>Only solution is $(0, 0, 0)$.</p>
+                        </div>
+                        <div class="step-reveal s6-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Hessian Determinants</strong>
+                            <p class="mt-1">$$H = \begin{pmatrix} 2 & -2 & 0 \\ -2 & 4 & -4 \\ 0 & -4 & 6 \end{pmatrix}$$</p>
+                            <p>$\Delta_1 = 2 > 0$, $\Delta_2 = 8 - 4 = 4 > 0$, $\Delta_3 = 2(24 - 16) - (-2)(-12) = 16 - 24 = -8 < 0$.</p>
+                            <p>Fails positive/negative definite test $\implies$ <strong>Saddle Point</strong> at $(0,0,0)$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 3 -->
+                    <div id="s6-ex-2" class="s6-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 3:</strong> Find maximum of $f(x, y, z) = 10 - x^2 - y^2 - z^2 + 2x$.
+                        </div>
+                        <div class="step-reveal s6-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Derivatives</strong>
+                            <p class="mt-1">$f_x = -2x + 2 = 0 \implies x = 1$, $f_y = -2y = 0 \implies y = 0$, $f_z = -2z = 0 \implies z = 0$.</p>
+                        </div>
+                        <div class="step-reveal s6-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Hessian</strong>
+                            <p class="mt-1">$\Delta_1 = -2 < 0$, $\Delta_2 = 4 > 0$, $\Delta_3 = -8 < 0$ (Alternating signs).</p>
+                            <p>Negative Definite $\implies$ <strong>Local Maximum</strong> at $(1, 0, 0)$ with Max Value = $11$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 4 -->
+                    <div id="s6-ex-3" class="s6-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 4:</strong> Test $f(x, y, z) = x^2 - y^2 + z^2 + 4x - 2z$.
+                        </div>
+                        <div class="step-reveal s6-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Critical Point</strong>
+                            <p class="mt-1">Point $(-2, 0, 1)$.</p>
+                        </div>
+                        <div class="step-reveal s6-ex-step p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 rounded-lg">
+                            <strong class="text-amber-500">Step 2: Hessian Test</strong>
+                            <p class="mt-1">$\Delta_1 = 2 > 0$, $\Delta_2 = -4 < 0$. Indefinite matrix $\implies$ <strong>Saddle Point</strong>.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 5 -->
+                    <div id="s6-ex-4" class="s6-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 5:</strong> Find minimum of $f(x, y, z) = x^2 + 2y^2 + z^2 - xz + x$.
+                        </div>
+                        <div class="step-reveal s6-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: System of Equations</strong>
+                            <p class="mt-1">$2x - z + 1 = 0$, $4y = 0$, $2z - x = 0 \implies z = x/2$.</p>
+                            <p>Solving: $2x - x/2 = -1 \implies 3x/2 = -1 \implies x = -2/3, y = 0, z = -1/3$.</p>
+                        </div>
+                        <div class="step-reveal s6-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Conclusion</strong>
+                            <p class="mt-1">$\Delta_1 = 2 > 0$, $\Delta_2 = 8 > 0$, $\Delta_3 = 4(3) = 12 > 0 \implies$ <strong>Minimum</strong> at $(-2/3, 0, -1/3)$.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 7: Unsolved Questions - 3 Variables -->
+                <div class="slide-content" id="slide-6">
+                    <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400 mb-2">15 Practice Questions: 3 Variables</h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-xs mb-4">Click "Show Solution Key" to expand answers.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">1. $f(x, y, z) = x^2 + y^2 + z^2 - 4x + 2y - 6z$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(2, -1, 3)$, Min Value = $-14$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">2. $f(x, y, z) = 12 - x^2 - 2y^2 - 3z^2$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max at $(0, 0, 0)$, Max Value = $12$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">3. $f(x, y, z) = x^2 + y^2 - z^2$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Saddle point at $(0, 0, 0)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">4. $f(x, y, z) = x^2 + 3y^2 + 2z^2 - 2xy + 4z$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(0, 0, -1)$, Min Value = $-2$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">5. $f(x, y, z) = x^3 + y^3 + z^3 - 3xyz$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Critical line along $x=y=z$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">6. $f(x, y, z) = x^2 + y^2 + z^2 + 2x - 4y + 6z + 10$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(-1, 2, -3)$, Min Value = $-4$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">7. $f(x, y, z) = 5x^2 + 2y^2 + 2z^2 + 4xy - 2yz$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(0, 0, 0)$, Min Value = $0$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">8. $f(x, y, z) = x y z - x^2 - y^2 - z^2$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max at $(0, 0, 0)$, Max Value = $0$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">9. $f(x, y, z) = x^4 + y^4 + z^4 - 4xyz$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Minima at $(1,1,1)$, $(-1,-1,1)$, etc.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">10. $f(x, y, z) = 2x^2 + y^2 + 3z^2 - 8x - 2y + 12z$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(2, 1, -2)$, Min Value = $-21$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">11. $f(x, y, z) = x^2 - y^2 - z^2 + 4x$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Saddle point at $(-2, 0, 0)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">12. $f(x, y, z) = (x+y+z)^2$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Minima plane $x + y + z = 0$ with Value = $0$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">13. $f(x, y, z) = e^{x^2 + 2y^2 + z^2}$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(0, 0, 0)$, Min Value = $1$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">14. $f(x, y, z) = x^2 + 4y^2 + 9z^2 - 2x - 8y - 18z$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(1, 1, 1)$, Min Value = $-14$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">15. $f(x, y, z) = 3x^2 + y^2 + 2z^2 - 3x$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min at $(1/2, 0, 0)$, Min Value = $-3/4$.</p>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 8: Lagrange Theory - 2 Variables -->
+                <div class="slide-content" id="slide-7">
+                    <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400 mb-2 flex items-center">
+                        <i class="fa-solid fa-link mr-2"></i> Lagrange Multipliers: 2 Variables Theory
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm mb-6">Optimizing $f(x, y)$ subject to constraint $\phi(x, y) = 0$</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-100 mb-2">1. Geometric Intuition</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">At an extreme point on the constraint curve $\phi(x, y) = 0$, the gradient vector $\nabla f$ is parallel to the gradient vector $\nabla \phi$.</p>
+                            <div class="bg-sky-50 dark:bg-sky-950/40 p-3 rounded-lg mt-3 text-center text-sm font-mono text-sky-600 dark:text-sky-300">
+                                $$\nabla f(x, y) = \lambda \nabla \phi(x, y)$$
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-100 mb-2">2. Lagrange Auxiliary Function</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">Define the combined function $F(x, y, \lambda)$:</p>
+                            <div class="bg-indigo-50 dark:bg-indigo-950/40 p-3 rounded-lg mt-3 text-center text-sm font-mono text-indigo-600 dark:text-indigo-300">
+                                $$F(x, y, \lambda) = f(x, y) + \lambda \cdot \phi(x, y)$$
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <h4 class="font-semibold text-slate-800 dark:text-slate-100 mb-2">3. System of Equations to Solve</h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Set all partial derivatives equal to zero:</p>
+                        <div class="text-center font-mono text-sm space-y-1 mt-2">
+                            <p>$$\frac{\partial F}{\partial x} = f_x + \lambda \phi_x = 0$$</p>
+                            <p>$$\frac{\partial F}{\partial y} = f_y + \lambda \phi_y = 0$$</p>
+                            <p>$$\frac{\partial F}{\partial \lambda} = \phi(x, y) = 0$$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 9: Solved Examples - Lagrange 2 Variables -->
+                <div class="slide-content" id="slide-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400">5 Solved Examples: Lagrange (2 Variables)</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Step-by-step solutions</p>
+                        </div>
+                        <button onclick="revealNextStep('s9-ex')" class="px-3 py-1.5 text-xs font-semibold bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition shadow-md flex items-center">
+                            <i class="fa-solid fa-forward mr-1.5"></i> Next Step
+                        </button>
+                    </div>
+
+                    <div class="flex space-x-2 border-b border-slate-200 dark:border-slate-700 mb-4 overflow-x-auto pb-1">
+                        <button onclick="switchTab('s9', 0)" class="s9-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-sky-500 text-white">Ex 1: Linear Constraint</button>
+                        <button onclick="switchTab('s9', 1)" class="s9-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 2: Circle Constraint</button>
+                        <button onclick="switchTab('s9', 2)" class="s9-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 3: Product Function</button>
+                        <button onclick="switchTab('s9', 3)" class="s9-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 4: Distance to Line</button>
+                        <button onclick="switchTab('s9', 4)" class="s9-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 5: Rectangle Perimeter</button>
+                    </div>
+
+                    <!-- EX 1 -->
+                    <div id="s9-ex-0" class="s9-ex-content space-y-3">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 1:</strong> Find the minimum of $f(x, y) = x^2 + y^2$ subject to $x + y = 2$.
+                        </div>
+
+                        <div class="step-reveal s9-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Set up Lagrange Function</strong>
+                            <p class="mt-1">$F(x, y, \lambda) = x^2 + y^2 + \lambda(x + y - 2)$.</p>
+                        </div>
+
+                        <div class="step-reveal s9-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 2: Take Partial Derivatives</strong>
+                            <p class="mt-1">$F_x = 2x + \lambda = 0 \implies x = -\lambda / 2$</p>
+                            <p>$F_y = 2y + \lambda = 0 \implies y = -\lambda / 2$</p>
+                            <p>Thus, $x = y$.</p>
+                        </div>
+
+                        <div class="step-reveal s9-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 3: Solve via Constraint</strong>
+                            <p class="mt-1">Substitute $x = y$ into $x + y = 2 \implies 2x = 2 \implies x = 1, y = 1$.</p>
+                        </div>
+
+                        <div class="step-reveal s9-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 4: Final Answer</strong>
+                            <p class="mt-1">Minimum point: $(1, 1)$.</p>
+                            <p class="font-bold text-slate-800 dark:text-slate-100">Minimum Value: $f(1, 1) = 1^2 + 1^2 = 2$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 2 -->
+                    <div id="s9-ex-1" class="s9-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 2:</strong> Maximize $f(x, y) = 3x + 4y$ on the circle $x^2 + y^2 = 25$.
+                        </div>
+                        <div class="step-reveal s9-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: System</strong>
+                            <p class="mt-1">$3 + 2\lambda x = 0 \implies x = -3/(2\lambda)$</p>
+                            <p>$4 + 2\lambda y = 0 \implies y = -4/(2\lambda) \implies y = \frac{4}{3}x$.</p>
+                        </div>
+                        <div class="step-reveal s9-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Solve & Substitute</strong>
+                            <p class="mt-1">$x^2 + (16/9)x^2 = 25 \implies (25/9)x^2 = 25 \implies x = \pm 3, y = \pm 4$.</p>
+                            <p class="font-bold text-slate-800 dark:text-slate-100">Max Value at $(3, 4)$: $f(3,4) = 3(3) + 4(4) = 25$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 3 -->
+                    <div id="s9-ex-2" class="s9-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 3:</strong> Maximize $f(x, y) = xy$ subject to $2x + 3y = 12$.
+                        </div>
+                        <div class="step-reveal s9-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Equations</strong>
+                            <p class="mt-1">$y + 2\lambda = 0$, $x + 3\lambda = 0 \implies \lambda = -y/2 = -x/3 \implies 2x = 3y$.</p>
+                        </div>
+                        <div class="step-reveal s9-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Conclusion</strong>
+                            <p class="mt-1">$3y + 3y = 12 \implies y = 2, x = 3$.</p>
+                            <p class="font-bold text-slate-800 dark:text-slate-100">Max Value: $f(3, 2) = 6$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 4 -->
+                    <div id="s9-ex-3" class="s9-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 4:</strong> Find closest point on line $x + 2y = 5$ to origin $(0,0)$.
+                        </div>
+                        <div class="step-reveal s9-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Minimize $D = x^2 + y^2$</strong>
+                            <p class="mt-1">$2x + \lambda = 0$, $2y + 2\lambda = 0 \implies y = 2x$.</p>
+                        </div>
+                        <div class="step-reveal s9-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Solve</strong>
+                            <p class="mt-1">$x + 2(2x) = 5 \implies 5x = 5 \implies x = 1, y = 2$. Point $(1, 2)$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 5 -->
+                    <div id="s9-ex-4" class="s9-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 5:</strong> Maximize area $A = xy$ of rectangle with fixed perimeter $2x + 2y = P$.
+                        </div>
+                        <div class="step-reveal s9-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Lagrange Equations</strong>
+                            <p class="mt-1">$y + 2\lambda = 0$, $x + 2\lambda = 0 \implies x = y$.</p>
+                        </div>
+                        <div class="step-reveal s9-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Result</strong>
+                            <p class="mt-1">$2x + 2x = P \implies x = y = P/4$ (A square maximizes area!).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 10: Unsolved Questions - Lagrange 2 Variables -->
+                <div class="slide-content" id="slide-9">
+                    <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400 mb-2">15 Practice Questions: Lagrange (2 Variables)</h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-xs mb-4">Click "Show Solution Key" to verify answers.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">1. Max $f(x, y) = x + y$ s.t. $x^2 + y^2 = 1$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $\sqrt{2}$ at $(1/\sqrt{2}, 1/\sqrt{2})$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">2. Min $f(x, y) = 2x + 3y$ s.t. $x + y = 5$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $10$ at $(5, 0)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">3. Max $f(x, y) = xy$ s.t. $x^2 + y^2 = 8$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $4$ at $(2, 2)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">4. Min $f(x, y) = x^2 + 2y^2$ s.t. $x + y = 3$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $6$ at $(2, 1)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">5. Max $f(x, y) = 4x + 6y$ s.t. $x^2 + y^2 = 13$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $26$ at $(2, 3)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">6. Min $f(x, y) = x^2 + y^2$ s.t. $2x + 3y = 13$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $13$ at $(2, 3)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">7. Max $f(x, y) = x^2 y$ s.t. $x + y = 6$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $32$ at $(4, 2)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">8. Min $f(x, y) = 3x^2 + y^2$ s.t. $4x + y = 19$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $57$ at $(3, 7)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">9. Max $f(x, y) = x - y$ s.t. $x^2 + y^2 = 2$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $2$ at $(1, -1)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">10. Min $f(x, y) = (x-1)^2 + y^2$ s.t. $y = 2x$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $4/5$ at $(1/5, 2/5)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">11. Max $f(x, y) = x^3 y^2$ s.t. $x + y = 5$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $108$ at $(3, 2)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">12. Min $f(x, y) = x^2 + 4y^2$ s.t. $xy = 1$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $4$ at $(\sqrt{2}, 1/\sqrt{2})$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">13. Max $f(x, y) = x + 2y$ s.t. $x^2 + y^2 = 5$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $5$ at $(1, 2)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">14. Min $f(x, y) = x^2 + y^2$ s.t. $x - y = 4$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $8$ at $(2, -2)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">15. Max $f(x, y) = x y^3$ s.t. $x + y = 4$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $27$ at $(1, 3)$.</p>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 11: Lagrange Theory - 3 Variables -->
+                <div class="slide-content" id="slide-10">
+                    <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400 mb-2 flex items-center">
+                        <i class="fa-solid fa-cube mr-2"></i> Lagrange Multipliers: 3 Variables Theory
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm mb-6">Optimizing $u = f(x, y, z)$ subject to $\phi(x, y, z) = 0$</p>
+
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-100 mb-2">Lagrange Function Definition</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">Construct the auxiliary function $F(x, y, z, \lambda)$:</p>
+                            <div class="bg-sky-50 dark:bg-sky-950/40 p-3 rounded-lg mt-2 text-center text-sm font-mono text-sky-600 dark:text-sky-300">
+                                $$F(x, y, z, \lambda) = f(x, y, z) + \lambda \cdot \phi(x, y, z)$$
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-100 mb-2">System of Equations</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">Set gradient to zero $\nabla F = \mathbf{0}$:</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 text-center font-mono text-xs">
+                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded">$\frac{\partial F}{\partial x} = f_x + \lambda \phi_x = 0$</div>
+                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded">$\frac{\partial F}{\partial y} = f_y + \lambda \phi_y = 0$</div>
+                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded">$\frac{\partial F}{\partial z} = f_z + \lambda \phi_z = 0$</div>
+                                <div class="bg-slate-100 dark:bg-slate-800 p-2 rounded">$\phi(x, y, z) = 0$</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800 p-4 rounded-xl">
+                            <h4 class="font-semibold text-amber-600 dark:text-amber-400 mb-1">Standard Proof Template: $u = x^2 + y^2 + z^2$ s.t. $ax + by + cz = p$</h4>
+                            <p class="text-xs text-slate-700 dark:text-slate-300">
+                                1. $2x + a\lambda = 0 \implies x = -a\lambda/2$<br>
+                                2. $2y + b\lambda = 0 \implies y = -b\lambda/2$<br>
+                                3. $2z + c\lambda = 0 \implies z = -c\lambda/2$<br>
+                                4. Plug into constraint: $-\frac{\lambda}{2}(a^2+b^2+c^2) = p \implies \lambda = -\frac{2p}{a^2+b^2+c^2}$<br>
+                                5. Stationary Value: $$\mathbf{u = \frac{p^2}{a^2 + b^2 + c^2}}$$
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 12: Solved Examples - Lagrange 3 Variables -->
+                <div class="slide-content" id="slide-11">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400">5 Solved Examples: Lagrange (3 Variables)</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Step-by-step solutions</p>
+                        </div>
+                        <button onclick="revealNextStep('s12-ex')" class="px-3 py-1.5 text-xs font-semibold bg-sky-500 hover:bg-sky-600 text-white rounded-lg transition shadow-md flex items-center">
+                            <i class="fa-solid fa-forward mr-1.5"></i> Next Step
+                        </button>
+                    </div>
+
+                    <div class="flex space-x-2 border-b border-slate-200 dark:border-slate-700 mb-4 overflow-x-auto pb-1">
+                        <button onclick="switchTab('s12', 0)" class="s12-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-sky-500 text-white">Ex 1: Standard $u=x^2+y^2+z^2$</button>
+                        <button onclick="switchTab('s12', 1)" class="s12-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 2: Sphere Surface Distance</button>
+                        <button onclick="switchTab('s12', 2)" class="s12-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 3: Box Volume</button>
+                        <button onclick="switchTab('s12', 3)" class="s12-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 4: Product $u=xyz$</button>
+                        <button onclick="switchTab('s12', 4)" class="s12-tab-btn px-3 py-1 text-xs font-medium rounded-t-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Ex 5: Plane Minimum Distance</button>
+                    </div>
+
+                    <!-- EX 1 -->
+                    <div id="s12-ex-0" class="s12-ex-content space-y-3">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 1:</strong> Find stationary value of $u = x^2 + y^2 + z^2$ subject to $ax + by + cz = p$.
+                        </div>
+
+                        <div class="step-reveal s12-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Partial Derivatives</strong>
+                            <p class="mt-1">$2x + a\lambda = 0 \implies x = -a\lambda / 2$</p>
+                            <p>$2y + b\lambda = 0 \implies y = -b\lambda / 2$</p>
+                            <p>$2z + c\lambda = 0 \implies z = -c\lambda / 2$</p>
+                        </div>
+
+                        <div class="step-reveal s12-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 2: Substitute into Constraint</strong>
+                            <p class="mt-1">$a(-a\lambda/2) + b(-b\lambda/2) + c(-c\lambda/2) = p$</p>
+                            <p>$\implies -\frac{\lambda}{2}(a^2 + b^2 + c^2) = p \implies \lambda = -\frac{2p}{a^2+b^2+c^2}$.</p>
+                        </div>
+
+                        <div class="step-reveal s12-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 3: Point Coordinates</strong>
+                            <p class="mt-1">$x = \frac{ap}{a^2+b^2+c^2}, \quad y = \frac{bp}{a^2+b^2+c^2}, \quad z = \frac{cp}{a^2+b^2+c^2}$.</p>
+                        </div>
+
+                        <div class="step-reveal s12-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 4: Final Value</strong>
+                            <p class="mt-1 font-bold text-slate-800 dark:text-slate-100">$$u = \frac{a^2 p^2 + b^2 p^2 + c^2 p^2}{(a^2+b^2+c^2)^2} = \mathbf{\frac{p^2}{a^2 + b^2 + c^2}}$$</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 2 -->
+                    <div id="s12-ex-1" class="s12-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 2:</strong> Maximize $u = x + 2y + 3z$ on sphere $x^2 + y^2 + z^2 = 14$.
+                        </div>
+                        <div class="step-reveal s12-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: System</strong>
+                            <p class="mt-1">$1 + 2\lambda x = 0$, $2 + 2\lambda y = 0$, $3 + 2\lambda z = 0 \implies y = 2x, z = 3x$.</p>
+                        </div>
+                        <div class="step-reveal s12-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Solve & Max Value</strong>
+                            <p class="mt-1">$x^2 + 4x^2 + 9x^2 = 14 \implies 14x^2 = 14 \implies x = 1, y = 2, z = 3$.</p>
+                            <p class="font-bold text-slate-800 dark:text-slate-100">Max Value = $1 + 4 + 9 = 14$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 3 -->
+                    <div id="s12-ex-2" class="s12-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 3:</strong> Maximize box volume $V = xyz$ with fixed surface area $2(xy + yz + zx) = 12$.
+                        </div>
+                        <div class="step-reveal s12-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Symmetry Argument</strong>
+                            <p class="mt-1">By symmetry in $x, y, z$, $x = y = z$ at maximum.</p>
+                        </div>
+                        <div class="step-reveal s12-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Calculation</strong>
+                            <p class="mt-1">$2(3x^2) = 12 \implies 6x^2 = 12 \implies x = y = z = \sqrt{2}$.</p>
+                            <p class="font-bold text-slate-800 dark:text-slate-100">Max Volume $V = (\sqrt{2})^3 = 2\sqrt{2}$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 4 -->
+                    <div id="s12-ex-3" class="s12-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 4:</strong> Maximize $u = xyz$ subject to $x + y + z = 30$.
+                        </div>
+                        <div class="step-reveal s12-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Equations</strong>
+                            <p class="mt-1">$yz = \lambda$, $xz = \lambda$, $xy = \lambda \implies x = y = z$.</p>
+                        </div>
+                        <div class="step-reveal s12-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Conclusion</strong>
+                            <p class="mt-1">$3x = 30 \implies x = y = z = 10$.</p>
+                            <p class="font-bold text-slate-800 dark:text-slate-100">Max Value $u = 10 \times 10 \times 10 = 1000$.</p>
+                        </div>
+                    </div>
+
+                    <!-- EX 5 -->
+                    <div id="s12-ex-4" class="s12-ex-content space-y-3 hidden">
+                        <div class="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg font-medium text-slate-800 dark:text-slate-100">
+                            <strong>Problem 5:</strong> Find min distance from origin to plane $x + 2y + 2z = 9$.
+                        </div>
+                        <div class="step-reveal s12-ex-step p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <strong class="text-sky-500">Step 1: Square Distance $D = x^2 + y^2 + z^2$</strong>
+                            <p class="mt-1">$2x = \lambda, 2y = 2\lambda, 2z = 2\lambda \implies y = 2x, z = 2x$.</p>
+                        </div>
+                        <div class="step-reveal s12-ex-step p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-lg">
+                            <strong class="text-emerald-500">Step 2: Point & Distance</strong>
+                            <p class="mt-1">$x + 4x + 4x = 9 \implies 9x = 9 \implies x = 1, y = 2, z = 2$.</p>
+                            <p class="font-bold text-slate-800 dark:text-slate-100">Min Distance $\sqrt{1^2 + 2^2 + 2^2} = 3$.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 13: Unsolved Questions - Lagrange 3 Variables -->
+                <div class="slide-content" id="slide-12">
+                    <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400 mb-2">15 Practice Questions: Lagrange (3 Variables)</h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-xs mb-4">Click "Show Solution Key" to expand answers.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">1. Min $u = x^2 + y^2 + z^2$ s.t. $x + y + z = 1$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $1/3$ at $(1/3, 1/3, 1/3)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">2. Max $u = xyz$ s.t. $2x + 2y + z = 12$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $16$ at $(2, 2, 4)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">3. Min $u = x^2 + 2y^2 + 3z^2$ s.t. $x + y + z = 11$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $66$ at $(6, 3, 2)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">4. Max $u = x + y + z$ s.t. $x^2 + y^2 + z^2 = 3$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $3$ at $(1, 1, 1)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">5. Min $u = x^2 + y^2 + z^2$ s.t. $2x + 3y + 4z = 29$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $29$ at $(2, 3, 4)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">6. Max $u = x^2 y^3 z^4$ s.t. $x + y + z = 18$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max at $x=4, y=6, z=8$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">7. Min distance from origin to $x + y + z = 6$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Distance = $2\sqrt{3}$ at $(2, 2, 2)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">8. Max $u = x y z^2$ s.t. $x + y + z = 20$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max at $x=5, y=5, z=10$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">9. Min $u = x^2 + y^2 + z^2$ s.t. $x + 2y + 2z = 9$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $9$ at $(1, 2, 2)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">10. Max $u = 8xyz$ s.t. $x^2 + y^2 + z^2 = 12$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $64$ at $(2, 2, 2)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">11. Min $u = 3x^2 + 2y^2 + z^2$ s.t. $x + y + z = 11$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $66$ at $(2, 3, 6)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">12. Max $u = x^2 y z$ s.t. $2x + y + z = 16$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $256$ at $(4, 4, 4)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">13. Min $u = x^2 + 4y^2 + 9z^2$ s.t. $x + y + z = 11$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $36$ at $(6, 3, 2)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">14. Max $u = x+2y+3z$ s.t. $x^2+y^2+z^2=56$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Max Value = $28$ at $(2, 4, 6)$.</p>
+                            </details>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <p class="text-sm font-semibold">15. Min $u = x^2+y^2+z^2$ s.t. $x+y+2z=12$</p>
+                            <details class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                <summary class="cursor-pointer text-sky-500 hover:underline">Show Solution Key</summary>
+                                <p class="mt-1 text-slate-700 dark:text-slate-200">Min Value = $24$ at $(2, 2, 4)$.</p>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SLIDE 14: Cheat Sheet & Summary -->
+                <div class="slide-content" id="slide-13">
+                    <h2 class="text-2xl font-bold text-sky-500 dark:text-sky-400 mb-2 flex items-center">
+                        <i class="fa-solid fa-bookmark mr-2"></i> Formula Cheat Sheet & Quick Summary
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-300 text-sm mb-6">Key Discriminants & Master Equations</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-2">2-Variable Discriminant ($rt - s^2$)</h4>
+                            <ul class="text-xs space-y-2 text-slate-600 dark:text-slate-300">
+                                <li><strong>$rt - s^2 > 0, r > 0$:</strong> Local Minimum</li>
+                                <li><strong>$rt - s^2 > 0, r < 0$:</strong> Local Maximum</li>
+                                <li><strong>$rt - s^2 < 0$:</strong> Saddle Point</li>
+                                <li><strong>$rt - s^2 = 0$:</strong> Inconclusive</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-2">3-Variable Hessian Minors</h4>
+                            <ul class="text-xs space-y-2 text-slate-600 dark:text-slate-300">
+                                <li><strong>$\Delta_1 > 0, \Delta_2 > 0, \Delta_3 > 0$:</strong> Minimum</li>
+                                <li><strong>$\Delta_1 < 0, \Delta_2 > 0, \Delta_3 < 0$:</strong> Maximum</li>
+                                <li><strong>Other Non-zero:</strong> Saddle Point</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-sky-50 dark:bg-sky-950/40 border border-sky-300 dark:border-sky-800 p-4 rounded-xl text-center">
+                        <h4 class="font-bold text-sky-600 dark:text-sky-300 text-sm mb-1">Master Lagrange Result</h4>
+                        <p class="text-xs text-slate-700 dark:text-slate-300">For $u = x^2 + y^2 + z^2$ subject to $ax + by + cz = p$:</p>
+                        <p class="text-lg font-bold text-sky-500 mt-2">$$u_{min} = \frac{p^2}{a^2 + b^2 + c^2}$$</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- BOTTOM PRESENTATION CONTROLS -->
+            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700/80 flex items-center justify-between">
+                <button id="prev-btn" onclick="prevSlide()" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 rounded-lg text-sm font-semibold transition flex items-center shadow-sm">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Previous
+                </button>
+
+                <div class="hidden sm:flex items-center space-x-1 text-xs text-slate-500 dark:text-slate-400">
+                    <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded">←</kbd>
+                    <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded">→</kbd>
+                    <span>to navigate</span>
+                </div>
+
+                <button id="next-btn" onclick="nextSlide()" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-semibold transition flex items-center shadow-md">
+                    Next <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- TABLE OF CONTENTS MODAL -->
+    <div id="toc-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700 pb-3 mb-4">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center">
+                    <i class="fa-solid fa-list-ol mr-2 text-sky-500"></i> Table of Contents
+                </h3>
+                <button onclick="toggleTOC()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto flex-grow space-y-2 pr-2 text-sm" id="toc-list">
+                <!-- Dynamically generated TOC links -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Total slides
+        const TOTAL_SLIDES = 14;
+        let currentSlide = 0;
+
+        const slideTitles = [
+            "Title & Concept Overview",
+            "Algorithm: Maxima & Minima (2 Variables)",
+            "5 Solved Examples (2 Variables)",
+            "15 Practice Questions (2 Variables)",
+            "Algorithm: Maxima & Minima (3 Variables)",
+            "5 Solved Examples (3 Variables)",
+            "15 Practice Questions (3 Variables)",
+            "Lagrange Multipliers: 2 Variables Theory",
+            "5 Solved Examples: Lagrange (2 Variables)",
+            "15 Practice Questions: Lagrange (2 Variables)",
+            "Lagrange Multipliers: 3 Variables Theory",
+            "5 Solved Examples: Lagrange (3 Variables)",
+            "15 Practice Questions: Lagrange (3 Variables)",
+            "Formula Cheat Sheet & Quick Summary"
+        ];
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            buildTOC();
+            updateSlideUI();
+            
+            // Key navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'Space') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                } else if (e.key === 'Escape') {
+                    closeTOC();
+                }
+            });
+        });
+
+        // Toggle Dark/Light Mode
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        // Slide Navigation
+        function goToSlide(index) {
+            if (index < 0) index = 0;
+            if (index >= TOTAL_SLIDES) index = TOTAL_SLIDES - 1;
+            
+            document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+            currentSlide = index;
+            document.getElementById(`slide-${currentSlide}`).classList.add('active');
+            
+            updateSlideUI();
+            closeTOC();
+
+            // Re-render MathJax for the newly visible slide
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < TOTAL_SLIDES - 1) {
+                goToSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        function updateSlideUI() {
+            // Update Progress Bar
+            const percentage = ((currentSlide + 1) / TOTAL_SLIDES) * 100;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+
+            // Update Badge
+            document.getElementById('slide-badge').innerText = `Slide ${currentSlide + 1} / ${TOTAL_SLIDES}`;
+
+            // Buttons state
+            document.getElementById('prev-btn').disabled = (currentSlide === 0);
+            document.getElementById('prev-btn').classList.toggle('opacity-50', currentSlide === 0);
+
+            const isLast = (currentSlide === TOTAL_SLIDES - 1);
+            document.getElementById('next-btn').innerHTML = isLast ? 
+                'Finish <i class="fa-solid fa-check ml-2"></i>' : 
+                'Next <i class="fa-solid fa-arrow-right ml-2"></i>';
+        }
+
+        // Step-by-step reveal handler
+        function revealNextStep(prefix) {
+            // Find active subtab in this slide
+            const activeTabContent = document.querySelector(`.${prefix}-content:not(.hidden)`);
+            if (!activeTabContent) return;
+
+            const hiddenSteps = activeTabContent.querySelectorAll('.step-reveal:not(.revealed)');
+            if (hiddenSteps.length > 0) {
+                hiddenSteps[0].classList.add('revealed');
+                if (window.MathJax && window.MathJax.typesetPromise) {
+                    window.MathJax.typesetPromise();
+                }
+            }
+        }
+
+        // Switch sub-tabs (for solved examples)
+        function switchTab(prefix, index) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll(`.${prefix}-content`);
+            contents.forEach(el => el.classList.add('hidden'));
+
+            // Reset tab button styles
+            const btns = document.querySelectorAll(`.${prefix}-tab-btn`);
+            btns.forEach(btn => {
+                btn.classList.remove('bg-sky-500', 'text-white');
+                btn.classList.add('bg-slate-200', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+            });
+
+            // Show targeted content & update button
+            const targetContent = document.getElementById(`${prefix}-ex-${index}`);
+            if (targetContent) targetContent.classList.remove('hidden');
+
+            if (btns[index]) {
+                btns[index].classList.remove('bg-slate-200', 'dark:bg-slate-700', 'text-slate-700', 'dark:text-slate-300');
+                btns[index].classList.add('bg-sky-500', 'text-white');
+            }
+
+            // Typeset LaTeX inside
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise();
+            }
+        }
+
+        // TOC Modal Handling
+        function buildTOC() {
+            const listContainer = document.getElementById('toc-list');
+            listContainer.innerHTML = '';
+
+            slideTitles.forEach((title, idx) => {
+                const item = document.createElement('div');
+                item.className = 'p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 hover:bg-sky-50 dark:hover:bg-sky-950/50 cursor-pointer flex items-center justify-between border border-slate-200 dark:border-slate-700 transition';
+                item.onclick = () => goToSlide(idx);
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 h-6 rounded-full bg-sky-500 text-white font-bold text-xs flex items-center justify-center">${idx + 1}</span>
+                        <span class="font-medium text-slate-800 dark:text-slate-200">${title}</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-400 text-xs"></i>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function toggleTOC() {
+            const modal = document.getElementById('toc-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function closeTOC() {
+            document.getElementById('toc-modal').classList.add('hidden');
+        
+        }
+        // Toggle Solution Functionality (Closes all other open solutions)
+function toggleSolution(id, btn) {
+    const targetSolution = document.getElementById(id); //
+    const isCurrentlyActive = targetSolution.classList.contains('active'); //
+
+    // Close all active solutions[cite: 7]
+    const allSolutions = document.querySelectorAll('.solution-content'); //[cite: 7]
+    const allButtons = document.querySelectorAll('.solution-btn'); //[cite: 7]
+
+    allSolutions.forEach(sol => sol.classList.remove('active')); //[cite: 7]
+    allButtons.forEach(b => b.textContent = 'Show Solution'); //[cite: 7]
+
+    // If the clicked solution was not open, open it[cite: 7]
+    if (!isCurrentlyActive) { //[cite: 7]
+        targetSolution.classList.add('active'); //[cite: 7]
+        btn.textContent = 'Hide Solution'; //[cite: 7]
+    }
+}
+    </script>
+</body>
+</html>
